@@ -86,32 +86,35 @@ const scrap = (html) => {
 
 
 const mainScrap = async () => {
+    const LIMIT_MAX_STUDENT = 300;
+
     const result = [];
     for (let i = 0; i < majorCodes.length; ++i){
         console.log(`${new Date().toISOString()}: Start scrapping for major ${major[majorCodes[i]]}`);
-
         for (let j = 0; j < yearWantToScrape.length; ++j){
-            let isResponseOK = true;
-           
             console.log(`\t ${new Date().toISOString()}: Start scrapping for year 20${yearWantToScrape[j].toString()}`);
            
-            for (let k = 1; isResponseOK && k <= 300; ++k) {
-                let studentNim = createStandardNim(majorCodes[i], yearWantToScrape[j], k);      
+            for (let k = 1; k <= LIMIT_MAX_STUDENT; ++k) {
+                const studentNim = createStandardNim(majorCodes[i], yearWantToScrape[j], k);      
     
                 const formData = new FormData();
                 formData.append('NICitb', process.env.NICITB);
                 formData.append('uid', studentNim);
                 requestOption.data = formData;
                 requestOption.headers['Content-Type'] = `multipart/form-data; boundary=${formData._boundary}`;
+                
+                try {
+                    const response = await axios(requestOption);
+                    const htmlResponse = response.data;
     
-                const response = await axios(requestOption);
-                const htmlResponse = response.data;
-
-                const resultScrapper = scrap(htmlResponse);
-                if (resultScrapper === "Not Found!") {
-                    isResponseOK = false;
-                } else {
-                    result.push(resultScrapper);
+                    const resultScrapper = scrap(htmlResponse);
+                    if (resultScrapper === "Not Found!") {
+                        isResponseOK = false;
+                    } else {
+                        result.push(resultScrapper);
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
             }
         }
