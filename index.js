@@ -12,7 +12,7 @@ const major = {
     '182': 'Sistem dan Teknologi Informasi'
 };
 const majorCodes = Object.keys(major);
-const yearWantToScrape = [17, 18, 19];
+const yearWantToScrape = [16, 17, 18, 19];
 
 const createStandardNim = (majorCode, yearCode, id) =>{
     let studentNim = majorCode + yearCode;
